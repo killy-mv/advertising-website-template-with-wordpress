@@ -1,0 +1,24 @@
+<!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"rt-main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group rt-main">
+	<!-- wp:heading {"level":1} -->
+	<h1 class="wp-block-heading">News &amp; Events</h1>
+	<!-- /wp:heading -->
+	<!-- wp:query {"queryId":1,"query":{"perPage":9,"postType":"post","inherit":true},"align":"wide"} -->
+	<div class="wp-block-query alignwide">
+		<!-- wp:post-template {"className":"rt-cards","layout":{"type":"grid","columnCount":3}} -->
+			<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"4/3"} /-->
+			<!-- wp:post-date {"className":"rt-eyebrow"} /-->
+			<!-- wp:post-title {"level":2,"isLink":true,"fontSize":"large"} /-->
+			<!-- wp:post-excerpt {"excerptLength":22} /-->
+		<!-- /wp:post-template -->
+		<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
+			<!-- wp:query-pagination-previous /-->
+			<!-- wp:query-pagination-numbers /-->
+			<!-- wp:query-pagination-next /-->
+		<!-- /wp:query-pagination -->
+	</div>
+	<!-- /wp:query -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","area":"footer","tagName":"footer"} /-->

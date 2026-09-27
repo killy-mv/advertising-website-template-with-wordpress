@@ -1,5 +1,22 @@
 name: restaurant-wp
 
+# Shared by the WordPress (PHP-FPM) and WP-CLI containers
+x-wp-env: &wp-env
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_NAME: ${DB_NAME}
+  WORDPRESS_DB_USER: ${DB_USER}
+  WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+  WORDPRESS_CONFIG_EXTRA: require_once '/var/www/config/wp-config-extra.php';
+  SITE_URL: ${SITE_URL}
+  WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE:-local}
+
+# WordPress core lives in a named volume (fast); only our own code is bind-mounted
+x-wp-volumes: &wp-volumes
+  - wp_files:/var/www/html
+  - ./wordpress/themes/restaurant-theme:/var/www/html/wp-content/themes/restaurant-theme
+  - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins
+  - ./wordpress/wp-config-extra.php:/var/www/config/wp-config-extra.php:ro
+
 services:
   db:
     image: mariadb:11
@@ -29,20 +46,17 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/snippets:/etc/nginx/snippets:ro
       - wp_files:/var/www/html:ro
+      - ./wordpress/themes/restaurant-theme:/var/www/html/wp-content/themes/restaurant-theme:ro
 
   wordpress:
-    image: wordpress:php8.3-fpm
+    build: ./wordpress
+    image: restaurant-wp/wordpress
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: ${DB_NAME}
-      WORDPRESS_DB_USER: ${DB_USER}
-      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - wp_files:/var/www/html
+    environment: *wp-env
+    volumes: *wp-volumes
 
   # One-off admin tool: docker compose run --rm wpcli <command>
   wpcli:
@@ -53,13 +67,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: ${DB_NAME}
-      WORDPRESS_DB_USER: ${DB_USER}
-      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+    environment: *wp-env
     volumes:
       - wp_files:/var/www/html
+      - ./wordpress/themes/restaurant-theme:/var/www/html/wp-content/themes/restaurant-theme
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins
+      - ./wordpress/wp-config-extra.php:/var/www/config/wp-config-extra.php:ro
+      - ./scripts:/scripts:ro
 
 volumes:
   db_data:
