@@ -11,3 +11,6 @@ backups/*
 Thumbs.db
 .vscode/
 .idea/
+
+# Local scratch files
+.scratch/
