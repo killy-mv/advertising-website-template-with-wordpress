@@ -1,0 +1,13 @@
+# Secrets
+.env
+
+# Runtime data (lives in Docker volumes, but just in case)
+data/
+backups/*
+!backups/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
