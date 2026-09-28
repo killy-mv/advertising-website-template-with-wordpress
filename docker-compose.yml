@@ -11,6 +11,8 @@ x-wp-env: &wp-env
   WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE:-local}
   REDIS_HOST: redis
   NGINX_CACHE_PATH: /var/cache/nginx/wp
+  CF_ZONE_ID: ${CF_ZONE_ID:-}
+  CF_API_TOKEN: ${CF_API_TOKEN:-}
 
 # WordPress core lives in a named volume (fast); only our own code is bind-mounted
 x-wp-volumes: &wp-volumes
@@ -80,6 +82,18 @@ services:
         condition: service_healthy
     environment: *wp-env
     volumes: *wp-volumes
+
+  # Cloudflare Tunnel: publishes Nginx at your domain with no open ports.
+  # Start with:  docker compose --profile tunnel up -d   (see docs/cloudflare.md)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN:-}
+    depends_on:
+      - nginx
 
   # One-off admin tool: docker compose run --rm wpcli <command>
   wpcli:

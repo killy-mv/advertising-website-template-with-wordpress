@@ -10,6 +10,13 @@ if ( getenv( 'SITE_URL' ) ) {
 	define( 'WP_SITEURL', WP_HOME );
 }
 
+// Behind Cloudflare, visitors use HTTPS but Nginx receives plain HTTP from the tunnel.
+// Cloudflare sends X-Forwarded-Proto so WordPress knows the original scheme
+// (prevents redirect loops and mixed-content warnings).
+if ( 'https' === ( $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '' ) ) {
+	$_SERVER['HTTPS'] = 'on';
+}
+
 define( 'WP_ENVIRONMENT_TYPE', getenv( 'WP_ENVIRONMENT_TYPE' ) ?: 'production' );
 
 // No theme/plugin code editor in wp-admin.
