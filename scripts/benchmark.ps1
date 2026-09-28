@@ -1,11 +1,13 @@
 # Load-test the site and append a row to benchmarks/results.md.
 # Usage:  powershell -ExecutionPolicy Bypass -File scripts\benchmark.ps1 -Label "no cache"
 #         -Url https://restaurant.example.com  to test through Cloudflare instead of Nginx directly
+#         -Bypass  to skip the page cache and load the PHP backends
 param(
     [Parameter(Mandatory)] [string]$Label,
     [string]$Url = 'http://nginx',
     [int]$Vus = 20,
-    [string]$Duration = '30s'
+    [string]$Duration = '30s',
+    [switch]$Bypass  # skip the page cache (measure PHP capacity)
 )
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
@@ -13,6 +15,7 @@ Set-Location (Split-Path $PSScriptRoot -Parent)
 $envVars = @{}
 Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $k, $v = $_ -split '=', 2; $envVars[$k] = $v }
 $slug = ($Label -replace '[^\w]+', '-').Trim('-').ToLower()
+$bypassFlag = if ($Bypass) { '1' } else { '0' }
 $hostHeader = if ($Url -eq 'http://nginx') { ([uri]$envVars.SITE_URL).Authority } else { '' }
 
 function Get-DbQuestions {
@@ -21,11 +24,11 @@ function Get-DbQuestions {
 }
 
 Write-Host "==> Warming up" -ForegroundColor Cyan
-docker compose run --rm -q -e BASE_URL=$Url -e HOST_HEADER=$hostHeader -e VUS=5 -e DURATION=5s k6 run -q /bench/load.js | Out-Null
+docker compose run --rm -q -e BASE_URL=$Url -e HOST_HEADER=$hostHeader -e BYPASS=$bypassFlag -e VUS=5 -e DURATION=5s k6 run -q /bench/load.js | Out-Null
 
 Write-Host "==> $Label : $Vus virtual users for $Duration against $Url" -ForegroundColor Cyan
 $q0 = Get-DbQuestions
-docker compose run --rm -q -e BASE_URL=$Url -e HOST_HEADER=$hostHeader -e VUS=$Vus -e DURATION=$Duration k6 `
+docker compose run --rm -q -e BASE_URL=$Url -e HOST_HEADER=$hostHeader -e BYPASS=$bypassFlag -e VUS=$Vus -e DURATION=$Duration k6 `
     run -q --summary-export=/bench/raw/$slug.json /bench/load.js
 if ($LASTEXITCODE) { throw 'k6 failed' }
 $q1 = Get-DbQuestions

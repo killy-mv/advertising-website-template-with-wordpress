@@ -69,6 +69,10 @@ services:
     build: ./wordpress
     image: restaurant-wp/wordpress
     restart: unless-stopped
+    # Load balancing: Nginx spreads requests across all replicas.
+    # Every replica shares the same DB, Redis, files volume and page cache, so they're interchangeable.
+    deploy:
+      replicas: 2
     depends_on:
       db:
         condition: service_healthy
