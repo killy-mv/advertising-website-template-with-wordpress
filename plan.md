@@ -2,6 +2,17 @@
 
 A learning/portfolio project: a restaurant marketing website built on **WordPress**, served through **Nginx** (reverse proxy + load balancer), accelerated with **Redis** caching, and exposed to the internet via **Cloudflare**.
 
+## Status (2026-09-28)
+
+| Phase | Status |
+|---|---|
+| 0–6 | Done: see git history (one commit per phase) |
+| 7 Cloudflare | Code done and tested locally; needs your domain + tunnel token ([docs/cloudflare.md](docs/cloudflare.md)) |
+| 8 Benchmarks | Done: [benchmarks/results.md](benchmarks/results.md), [benchmarks/lighthouse.md](benchmarks/lighthouse.md) |
+| 9 Hardening & polish | Done: README, CI, backups, security headers, rate limits |
+
+Decisions taken: MariaDB 11 · block theme from scratch · menu as a custom post type (in a must-use plugin) · Nginx `fastcgi_cache` for the page cache · own reservation form instead of Contact Form 7 (stores bookings in wp-admin, works without email).
+
 ---
 
 ## 1. Goals
