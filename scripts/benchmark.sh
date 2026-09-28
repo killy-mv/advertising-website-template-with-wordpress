@@ -4,6 +4,9 @@
 # Usage: scripts/benchmark.sh [--bypass] [URL]      (default URL: http://nginx)
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# Git Bash on Windows would rewrite container paths like /scripts/seed.php or
+# the permalink /%postname%/ into C:/Program Files/Git/... (no effect elsewhere).
+export MSYS_NO_PATHCONV=1
 set -a
 # shellcheck source=/dev/null
 source .env

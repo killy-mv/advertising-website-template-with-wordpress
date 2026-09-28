@@ -2,6 +2,9 @@
 # One-command setup for Linux/macOS: builds the stack, installs WordPress, loads demo content.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# Git Bash on Windows would rewrite container paths like /scripts/seed.php or
+# the permalink /%postname%/ into C:/Program Files/Git/... (no effect elsewhere).
+export MSYS_NO_PATHCONV=1
 
 if [[ ! -f .env ]]; then
   cp .env.example .env
