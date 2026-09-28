@@ -32,6 +32,10 @@ echo "==> Configuring"
 wp theme activate restaurant-theme
 wp rewrite structure '/%postname%/'
 wp eval-file /scripts/seed.php
+
+echo "==> Redis object cache"
+wp plugin install redis-cache --activate
+wp redis enable 2>/dev/null || true  # errors harmlessly if already enabled
 wp cache flush
 
 echo

@@ -9,6 +9,7 @@ x-wp-env: &wp-env
   WORDPRESS_CONFIG_EXTRA: require_once '/var/www/config/wp-config-extra.php';
   SITE_URL: ${SITE_URL}
   WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE:-local}
+  REDIS_HOST: redis
 
 # WordPress core lives in a named volume (fast); only our own code is bind-mounted
 x-wp-volumes: &wp-volumes
@@ -34,6 +35,18 @@ services:
       timeout: 5s
       retries: 20
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   nginx:
     image: nginx:1.29-alpine
     restart: unless-stopped
@@ -55,6 +68,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment: *wp-env
     volumes: *wp-volumes
 
@@ -64,16 +79,25 @@ services:
     entrypoint: ["wp"]
     profiles: ["tools"]
     user: "33:33"
+    environment:
+      <<: *wp-env
+      WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
     depends_on:
       db:
         condition: service_healthy
-    environment: *wp-env
     volumes:
       - wp_files:/var/www/html
       - ./wordpress/themes/restaurant-theme:/var/www/html/wp-content/themes/restaurant-theme
       - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins
       - ./wordpress/wp-config-extra.php:/var/www/config/wp-config-extra.php:ro
       - ./scripts:/scripts:ro
+
+  # Load testing: see scripts/benchmark.ps1
+  k6:
+    image: grafana/k6:latest
+    profiles: ["tools"]
+    volumes:
+      - ./benchmarks:/bench
 
 volumes:
   db_data:

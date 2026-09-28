@@ -36,6 +36,10 @@ Write-Host '==> Configuring' -ForegroundColor Cyan
 wp theme activate restaurant-theme
 wp rewrite structure '/%postname%/'
 wp eval-file /scripts/seed.php
+
+Write-Host '==> Redis object cache' -ForegroundColor Cyan
+wp plugin install redis-cache --activate
+docker compose run --rm -q wpcli redis enable 2>$null  # errors harmlessly if already enabled
 wp cache flush
 
 Write-Host "`nDone! Site:  $($envVars.SITE_URL)" -ForegroundColor Green

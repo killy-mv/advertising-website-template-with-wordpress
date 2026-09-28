@@ -14,3 +14,14 @@ define( 'WP_ENVIRONMENT_TYPE', getenv( 'WP_ENVIRONMENT_TYPE' ) ?: 'production' )
 
 // No theme/plugin code editor in wp-admin.
 define( 'DISALLOW_FILE_EDIT', true );
+
+// Redis object cache (used by the Redis Object Cache plugin's object-cache.php drop-in).
+if ( getenv( 'REDIS_HOST' ) ) {
+	define( 'WP_REDIS_HOST', getenv( 'REDIS_HOST' ) );
+	define( 'WP_REDIS_PORT', 6379 );
+	define( 'WP_REDIS_PREFIX', 'restaurant:' ); // namespace keys if Redis is shared
+	define( 'WP_REDIS_TIMEOUT', 1 );
+	define( 'WP_REDIS_READ_TIMEOUT', 1 );
+	define( 'WP_REDIS_MAXTTL', 86400 );         // nothing lives longer than a day
+	define( 'WP_REDIS_GRACEFUL', true );        // Redis down = slower site, not a broken one
+}
