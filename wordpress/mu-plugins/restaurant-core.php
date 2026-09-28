@@ -15,3 +15,4 @@ require RC_DIR . '/info.php';
 require RC_DIR . '/menu.php';
 require RC_DIR . '/reservations.php';
 require RC_DIR . '/seo.php';
+require RC_DIR . '/performance.php';

@@ -9,7 +9,7 @@ if (-not (Test-Path .env)) {
     exit 1
 }
 $envVars = @{}
-Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $k, $v = $_ -split '=', 2; $envVars[$k] = $v }
+Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $k, $v = $_ -split '=', 2; $envVars[$k] = $v.Trim('"') }
 
 function wp { docker compose run --rm -q wpcli @args; if ($LASTEXITCODE) { throw "wp $args failed" } }
 

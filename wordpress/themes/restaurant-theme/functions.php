@@ -19,3 +19,10 @@ add_action( 'wp_enqueue_scripts', function () {
 add_action( 'init', function () {
 	register_block_pattern_category( 'restaurant', array( 'label' => __( 'Restaurant', 'restaurant-theme' ) ) );
 } );
+
+// Favicon from the theme, unless the owner sets a Site Icon in Settings → General.
+add_action( 'wp_head', function () {
+	if ( ! has_site_icon() ) {
+		printf( '<link rel="icon" href="%s" type="image/svg+xml">' . "\n", esc_url( get_theme_file_uri( 'assets/img/favicon.svg' ) ) );
+	}
+} );

@@ -4,6 +4,8 @@
 	--rt-radius: 14px;
 	--rt-shadow: 0 10px 30px -12px rgb(31 27 22 / 0.25);
 	--rt-line: color-mix(in srgb, var(--wp--preset--color--contrast) 14%, transparent);
+	/* Lighter turmeric for text on the green band: 5:1 contrast (accent alone is 3.7:1) */
+	--rt-accent-on-dark: #f4cf7e;
 }
 
 body { -webkit-font-smoothing: antialiased; }
@@ -61,7 +63,7 @@ img { height: auto; }
 		var(--wp--preset--color--base);
 }
 .rt-hero h1 { margin-block: 0.4rem 1rem; text-wrap: balance; }
-.rt-hero__img img { width: 100%; max-width: 480px; margin-inline: auto; display: block; }
+.rt-hero__img img { width: 100%; max-width: 480px; aspect-ratio: 480 / 420; margin-inline: auto; display: block; } /* reserve space: no layout shift */
 
 /* ---------- Bands ---------- */
 .rt-band {
@@ -69,15 +71,15 @@ img { height: auto; }
 	background: var(--wp--preset--color--secondary);
 	color: var(--wp--preset--color--base);
 }
-.rt-band a { color: var(--wp--preset--color--accent); }
-.rt-band .rt-eyebrow { color: var(--wp--preset--color--accent); }
+.rt-band a { color: var(--rt-accent-on-dark); }
+.rt-band .rt-eyebrow { color: var(--rt-accent-on-dark); }
 .rt-facts { list-style: none; padding: 0; display: grid; gap: 1rem; }
 .rt-facts li {
 	padding: 1rem 1.25rem;
 	border: 1px solid color-mix(in srgb, var(--wp--preset--color--base) 25%, transparent);
 	border-radius: var(--rt-radius);
 }
-.rt-facts strong { display: block; font-family: var(--wp--preset--font-family--display); font-size: 2rem; color: var(--wp--preset--color--accent); }
+.rt-facts strong { display: block; font-family: var(--wp--preset--font-family--display); font-size: 2rem; color: var(--rt-accent-on-dark); }
 
 .rt-cta {
 	padding-block: var(--wp--preset--spacing--60);

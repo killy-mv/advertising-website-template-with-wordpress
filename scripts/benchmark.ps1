@@ -13,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
 $envVars = @{}
-Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $k, $v = $_ -split '=', 2; $envVars[$k] = $v }
+Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $k, $v = $_ -split '=', 2; $envVars[$k] = $v.Trim('"') }
 $slug = ($Label -replace '[^\w]+', '-').Trim('-').ToLower()
 $bypassFlag = if ($Bypass) { '1' } else { '0' }
 $hostHeader = if ($Url -eq 'http://nginx') { ([uri]$envVars.SITE_URL).Authority } else { '' }

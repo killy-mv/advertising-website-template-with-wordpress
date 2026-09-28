@@ -4,7 +4,10 @@
 # Usage: scripts/benchmark.sh [--bypass] [URL]      (default URL: http://nginx)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-set -a; source .env; set +a
+set -a
+# shellcheck source=/dev/null
+source .env
+set +a
 
 BYPASS=0
 if [[ "${1:-}" == "--bypass" ]]; then BYPASS=1; shift; fi

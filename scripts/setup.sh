@@ -8,7 +8,10 @@ if [[ ! -f .env ]]; then
   echo "Created .env from .env.example. Edit the passwords, then run this script again." >&2
   exit 1
 fi
-set -a; source .env; set +a
+set -a
+# shellcheck source=/dev/null
+source .env
+set +a
 
 wp() { docker compose run --rm -q wpcli "$@"; }
 

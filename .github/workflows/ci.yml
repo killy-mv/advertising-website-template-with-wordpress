@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compose file is valid
+        run: cp .env.example .env && docker compose config --quiet
+
+      - name: Nginx config
+        run: >
+          docker run --rm
+          -v "$PWD/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+          -v "$PWD/nginx/conf.d:/etc/nginx/conf.d:ro"
+          -v "$PWD/nginx/snippets:/etc/nginx/snippets:ro"
+          nginx:1.29 nginx -t
+
+      - name: PHP syntax
+        run: >
+          docker run --rm -v "$PWD:/app:ro" -w /app php:8.3-cli
+          sh -c 'find wordpress scripts -name "*.php" -print0 | xargs -0 -n1 php -l'
+
+      - name: Shell scripts
+        run: shellcheck scripts/*.sh
+
+  smoke:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start stack and load demo content
+        run: cp .env.example .env && bash scripts/setup.sh
+
+      - name: End-to-end checks
+        run: bash scripts/smoke-test.sh
+
+      - name: Short load test (page cache)
+        run: VUS=10 DURATION=10s bash scripts/benchmark.sh
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --tail=100
